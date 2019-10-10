@@ -12,7 +12,7 @@ import Detail from './views/film/index.vue'
 import Money from './views/money/money.vue'
 Vue.use(Router)
 
-export default new Router({
+let router = new Router({
   routes: [
     {
       path: '/',
@@ -29,6 +29,10 @@ export default new Router({
         {
           path: 'center',
           component: Center
+        },
+        {
+          path: '',
+          redirect: 'films'
         }
       ]
     },
@@ -46,7 +50,29 @@ export default new Router({
     },
     {
       path: '/money',
-      component: Money
+      component: Money,
+      meta: {
+        needLogin: true
+      }
     }
   ]
 })
+//实现登录拦截
+router.beforeEach((to, from, next) => {
+  let userInfo = window.localStorage.getItem('userInfo')
+  if (to.meta.needLogin && !userInfo) {
+    // next('/login')
+    //登录后想去你之前想去的页面
+    console.log(to)
+    next({
+      path: '/login',
+      query: {
+        redirect: to.fullPath
+      }
+    })
+  } else {
+    next()
+  }
+})
+
+export default router
